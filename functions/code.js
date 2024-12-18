@@ -1,17 +1,34 @@
-const mqtt = require('mqtt');
 const express = require('express');
-const bodyParser = require('body-parser');
+//const serverless = require('serverless-http');
+const router = express.Router();
+const bodyParser = require('express').json;
+const serverless = require('serverless-http');
+const mqtt = require('mqtt');
+//const express = require('express');
+//const bodyParser = require('body-parser');
 const WebSocket = require('ws');
 const fs = require('fs').promises;
 const { PubSub } = require('@google-cloud/pubsub');
 const pubSubClient = new PubSub({
   keyFilename: 'fir-ramish-e124e94214d2.json'
 });
+const PORT = 80;
+
+
+const app = express();
+// Middleware to parse JSON bodies
+app.use(express.json());
 
 // Setup Express server
-const app = express();
+
 const port = 3001;  // Choose a port for your API server
-app.use(bodyParser.json());
+//app.use(bodyParser.json());
+router.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Allow requests from all origins
+  res.setHeader('Access-Control-Allow-Methods', '*'); // Allow all HTTP methods
+  res.setHeader('Access-Control-Allow-Headers', '*'); // Allow all headers
+  next();
+});
 
 // MQTT Broker settings (replace with your broker info)
 const mqttBroker = 'mqtt://test.mosquitto.org';  // Broker URL (can be local or cloud-based)
@@ -73,12 +90,12 @@ client.on('message', async (topic, message) => {
     }
   }
 });
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
   res.send('Hello, Vercel!');
 });
 
 // API endpoint to retrieve the latest weather data
-app.get('/api/weather/current', (req, res) => {
+router.get('/api/weather/current', (req, res) => {
   try {
     if (global.weatherData) {
       res.json({ status: 'success', data: global.weatherData });
@@ -92,7 +109,7 @@ app.get('/api/weather/current', (req, res) => {
 });
 
 // API endpoint to retrieve the latest Pub/Sub message
-app.get('/api/pubsub/messages', (req, res) => {
+router.get('/api/pubsub/messages', (req, res) => {
   if (latestPubSubMessage) {
     res.json({
       status: 'success',
@@ -165,9 +182,9 @@ client.on('message', (topic, message) => {
 });
 
 // Start the Express server on port 3001
-app.listen(port, () => {
-  console.log(`Backend server is running on http://localhost:${port}`);
-});
+// app.listen(port, () => {
+//   console.log(`Backend server is running on http://localhost:${port}`);
+// });
 
 // Start WebSocket server on port 3002
 console.log(`WebSocket server running on ws://localhost:${wsPort}`);
@@ -179,3 +196,5 @@ process.on('SIGINT', () => {
   console.log('Shutting down gracefully...');
   process.exit();
 });
+app.use('/.netlify/functions',router);
+module.exports.handler= serverless(app);
