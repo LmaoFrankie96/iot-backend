@@ -4,7 +4,9 @@ const bodyParser = require('body-parser');
 const WebSocket = require('ws');
 const fs = require('fs').promises;
 const { PubSub } = require('@google-cloud/pubsub');
-const pubSubClient = new PubSub();
+const pubSubClient = new PubSub({
+  keyFilename: 'fir-ramish-e124e94214d2.json'
+});
 
 // Setup Express server
 const app = express();
