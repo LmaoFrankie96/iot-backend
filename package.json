@@ -1,10 +1,10 @@
 {
   "name": "iot-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "code.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start":"node code.js"
+    "start":"node api/code.js"
   },
   "keywords": [],
   "author": "",
