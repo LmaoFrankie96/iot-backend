@@ -196,5 +196,5 @@ process.on('SIGINT', () => {
   console.log('Shutting down gracefully...');
   process.exit();
 });
-app.use('/.netlify/functions',router);
+app.use('/.netlify/functions/api',router);
 module.exports.handler= serverless(app);
