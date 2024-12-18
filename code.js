@@ -71,6 +71,9 @@ client.on('message', async (topic, message) => {
     }
   }
 });
+app.get('/', (req, res) => {
+  res.send('Hello, Vercel!');
+});
 
 // API endpoint to retrieve the latest weather data
 app.get('/api/weather/current', (req, res) => {
